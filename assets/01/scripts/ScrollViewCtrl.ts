@@ -23,12 +23,14 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	}
 
 	async directLoad(length: number) {
+	    console.time("direct");
 		await new Promise((resolve, reject) => {
 			this.scrollView.content.removeAllChildren();
 			for (let i = 0; i < length; i++) {
 				this._initItem(i);
 			}
 			resolve();
+            console.timeEnd("direct");
 		});
 	}
 
@@ -37,7 +39,9 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 
 	async framingLoad(childNodeCount: number) {
 		this.scrollView.content.removeAllChildren();
+        console.time("framing");
 		await this.executePreFrame(this._getItemGenerator(childNodeCount), 1);
+        console.timeEnd("framing");
 	}
 
 	/**
