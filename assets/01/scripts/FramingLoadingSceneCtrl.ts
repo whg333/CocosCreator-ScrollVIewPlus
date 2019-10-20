@@ -33,6 +33,12 @@ export default class FramingLoadingSceneCtrl extends cc.Component {
 		this.loadingDialog.hide();
 	}
 
+    async onRecursionLoadBtnClick() {
+        this.loadingDialog.show();
+        await this.scrollViewCtrl.recursionLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.loadingDialog.hide();
+    }
+
     async onSequenceLoadBtnClick() {
         this.loadingDialog.show();
         await this.scrollViewCtrl.sequenceLoad(Number.parseInt(this.childNodeCountEditBox.string));

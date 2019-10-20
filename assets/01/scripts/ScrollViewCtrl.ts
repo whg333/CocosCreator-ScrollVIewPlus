@@ -10,27 +10,6 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	@property(cc.Prefab)
 	itemPrefab: cc.Prefab = null;
 
-    sleep(interval) {
-        return new Promise(resolve => {
-            setTimeout(resolve, interval);
-        })
-    }
-
-    async sequenceLoad(length: number){
-        this.scrollView.content.removeAllChildren();
-        console.time("sequence");
-        await this.sequence(length);
-        console.timeEnd("sequence");
-    }
-
-    async sequence(length: number) {
-        this._initItem(length);
-        await this.sleep(5);
-        if(length > 0){
-            await this.sequence(length-1);
-        }
-    }
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// 示例一：直接创建指定数量的子节点
 
@@ -99,6 +78,39 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 			yield this._initItem(i);
 		}
 	}
+
+    sleep(interval) {
+        return new Promise(resolve => {
+            setTimeout(resolve, interval);
+        })
+    }
+
+    async recursionLoad(length: number){
+        this.scrollView.content.removeAllChildren();
+        console.time("recursion");
+        await this.recursion(length);
+        console.timeEnd("recursion");
+    }
+
+    async recursion(length: number) {
+        this._initItem(length);
+        await this.sleep(0);
+        if(length > 0){
+            await this.recursion(length-1);
+        }
+    }
+
+    async sequenceLoad(length: number) {
+        this.scrollView.content.removeAllChildren();
+        console.time("sequence");
+        for(let i=0;i<length;i++){
+            this._initItem(i);
+            if(/*i != length-1*/i%10 == 0){ //相当于每次（帧）创建10个
+                await this.sleep(0);
+            }
+        }
+        console.timeEnd("sequence");
+    }
 
     private _initItem(itemIndex: number) {
         let itemNode = cc.instantiate(this.itemPrefab);
