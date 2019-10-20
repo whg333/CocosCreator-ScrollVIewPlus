@@ -10,22 +10,34 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	@property(cc.Prefab)
 	itemPrefab: cc.Prefab = null;
 
+    sleep(interval) {
+        return new Promise(resolve => {
+            setTimeout(resolve, interval);
+        })
+    }
+
+    async sequenceLoad(length: number){
+        this.scrollView.content.removeAllChildren();
+        console.time("sequence");
+        await this.sequence(length);
+        console.timeEnd("sequence");
+    }
+
+    async sequence(length: number) {
+        this._initItem(length);
+        await this.sleep(5);
+        if(length > 0){
+            await this.sequence(length-1);
+        }
+    }
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// 示例一：直接创建指定数量的子节点
 
-	private _initItem(itemIndex: number) {
-		let itemNode = cc.instantiate(this.itemPrefab);
-		itemNode.width = this.scrollView.content.width / 10;
-		itemNode.height = itemNode.width;
-		itemNode.parent = this.scrollView.content;
-		itemNode.setPosition(0, 0);
-		itemNode.getComponent(ItemPrefabCtrl).bindData(itemIndex);
-	}
-
 	async directLoad(length: number) {
+        this.scrollView.content.removeAllChildren();
 	    console.time("direct");
 		await new Promise((resolve, reject) => {
-			this.scrollView.content.removeAllChildren();
 			for (let i = 0; i < length; i++) {
 				this._initItem(i);
 			}
@@ -87,4 +99,13 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 			yield this._initItem(i);
 		}
 	}
+
+    private _initItem(itemIndex: number) {
+        let itemNode = cc.instantiate(this.itemPrefab);
+        itemNode.width = this.scrollView.content.width / 10;
+        itemNode.height = itemNode.width;
+        itemNode.parent = this.scrollView.content;
+        itemNode.setPosition(0, 0);
+        itemNode.getComponent(ItemPrefabCtrl).bindData(itemIndex);
+    }
 }
