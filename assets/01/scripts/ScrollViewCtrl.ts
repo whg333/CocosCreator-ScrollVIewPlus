@@ -2,6 +2,16 @@ import ItemPrefabCtrl from "./ItemPrefabCtrl";
 
 const { ccclass, property } = cc._decorator;
 
+interface Iterator {
+    hasNext(): boolean,
+    next(value?: any) : IterationResult,
+}
+
+interface IterationResult {
+    value: any,
+    done: boolean,
+}
+
 @ccclass
 export default class DirectLoadScrollViewCtrl extends cc.Component {
 	@property(cc.ScrollView)
@@ -34,7 +44,7 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	async framingLoad(childNodeCount: number) {
 		this.scrollView.content.removeAllChildren();
         console.time("framing");
-		await this.executePreFrame(this._getItemGenerator(childNodeCount), 1);
+		await this.executePreFrame(this._getItemGenerator(childNodeCount), 10);
         console.timeEnd("framing");
 	}
 
@@ -115,7 +125,53 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         console.timeEnd("sequence");
     }
 
+    async framingLoad2(length: number) {
+        this.scrollView.content.removeAllChildren();
+        console.time("framing2");
+        await this.executeSplitFrame(length);
+        console.timeEnd("framing2");
+    }
+
+    async executeSplitFrame(length: number){
+        let it: Iterator = this.makeItemIt(length);
+        while(it.hasNext()){
+            await this.runSplitFrame(it, 10);
+        }
+    }
+
+    makeItemIt(length: number): Iterator{
+        let nextIndex = 0;
+        let initItem = (index: number) => {
+            return this._initItem(index);
+        };
+        return {
+            hasNext: function() {
+                return nextIndex < length;
+            },
+            next: function() {
+                return this.hasNext()
+                    ? {value: function() {initItem(nextIndex++)}, done: false}
+                    : {value: undefined, done: true};
+            }
+        };
+    }
+
+    async runSplitFrame(it: Iterator, duration: number){
+        let startTime = new Date().getTime();
+        let stop = false;
+        do{
+            let next = it.next();
+            if(next.done){
+                return;
+            }
+            next.value();
+            stop = (new Date().getTime() - startTime >= duration);
+        }while(!stop);
+        await this.sleep(0);
+    }
+
     private _initItem(itemIndex: number) {
+	    // console.time("_initItem");
         let itemNode = cc.instantiate(this.itemPrefab);
         itemNode.width = this.scrollView.content.width / 10;
         itemNode.height = itemNode.width;
@@ -123,6 +179,7 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         itemNode.setPosition(0, 0);
         itemNode.getComponent(ItemPrefabCtrl).bindData(itemIndex);
         this.count++;
+        // console.timeEnd("_initItem");
     }
 
     reset(){
