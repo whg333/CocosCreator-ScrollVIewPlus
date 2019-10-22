@@ -23,25 +23,33 @@ export default class FramingLoadingSceneCtrl extends cc.Component {
 
 	async onDirectLoadBtnClick() {
 		this.loadingDialog.show();
+        this.scrollViewCtrl.reset();
 		await this.scrollViewCtrl.directLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.scrollViewCtrl.reset();
 		this.loadingDialog.hide();
 	}
 
 	async onFramingLoadBtnClick() {
 		this.loadingDialog.show();
+        this.scrollViewCtrl.reset();
 		await this.scrollViewCtrl.framingLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.scrollViewCtrl.reset();
 		this.loadingDialog.hide();
 	}
 
     async onRecursionLoadBtnClick() {
         this.loadingDialog.show();
+        this.scrollViewCtrl.reset();
         await this.scrollViewCtrl.recursionLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.scrollViewCtrl.reset();
         this.loadingDialog.hide();
     }
 
     async onSequenceLoadBtnClick() {
         this.loadingDialog.show();
+        this.scrollViewCtrl.reset();
         await this.scrollViewCtrl.sequenceLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.scrollViewCtrl.reset();
         this.loadingDialog.hide();
     }
 

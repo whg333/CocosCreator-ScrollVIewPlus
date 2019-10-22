@@ -10,6 +10,9 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	@property(cc.Prefab)
 	itemPrefab: cc.Prefab = null;
 
+	count: number = 0; //每帧创建的数目
+	frame: number = 0; //类似于帧数
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// 示例一：直接创建指定数量的子节点
 
@@ -119,5 +122,19 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         itemNode.parent = this.scrollView.content;
         itemNode.setPosition(0, 0);
         itemNode.getComponent(ItemPrefabCtrl).bindData(itemIndex);
+        this.count++;
     }
+
+    reset(){
+	    this.count = 0;
+	    this.frame = 0;
+    }
+
+    update(dt: number){
+        this.frame++;
+        if(this.count > 0){
+            cc.log("frame", this.frame, "count", this.count, "dt", ~~(dt*1000)+"ms");
+        }
+    }
+
 }
