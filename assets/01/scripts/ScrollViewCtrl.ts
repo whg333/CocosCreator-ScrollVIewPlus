@@ -23,6 +23,18 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 	count: number = 0; //每帧创建的数目
 	frame: number = 0; //类似于帧数
 
+    track: boolean = false;
+    sumSecond: number = 0;
+    sumFrame: number = 0;
+
+    onLoad(){
+        this.schedule(() => {
+            this.track = true;
+            this.sumSecond = 0;
+            this.sumFrame = 0;
+        }, 5)
+    }
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// 示例一：直接创建指定数量的子节点
 
@@ -190,7 +202,16 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
     update(dt: number){
         this.frame++;
         if(this.count > 0){
-            cc.log("frame", this.frame, "count", this.count, "dt", ~~(dt*1000)+"ms");
+            // cc.log("frame", this.frame, "count", this.count, "dt", ~~(dt*1000)+"ms", "FPS =", cc.game.getFrameRate());
+        }
+
+        if(this.track){
+            this.sumSecond += dt;
+            this.sumFrame++;
+            if(this.sumSecond >= 3){
+                this.track = false;
+                cc.log("sumFrame", this.sumFrame, "FPS", ~~(this.sumFrame/this.sumSecond), ~~(this.sumSecond)+"s");
+            }
         }
     }
 
