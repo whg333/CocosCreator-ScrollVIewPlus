@@ -19,6 +19,7 @@ export default class FramingLoadingSceneCtrl extends cc.Component {
 
 	onLoad() {
 		this.loadingDialog.hide();
+		this.scrollViewCtrl.loadingDialog = this.loadingDialog;
 	}
 
 	async onDirectLoadBtnClick() {
@@ -48,10 +49,19 @@ export default class FramingLoadingSceneCtrl extends cc.Component {
     async onSequenceLoadBtnClick() {
         this.loadingDialog.show();
         this.scrollViewCtrl.reset();
-        //await this.scrollViewCtrl.sequenceLoad(Number.parseInt(this.childNodeCountEditBox.string));
-        await this.scrollViewCtrl.framingLoad2(Number.parseInt(this.childNodeCountEditBox.string));
+        await this.scrollViewCtrl.sequenceLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        // await this.scrollViewCtrl.framingLoad2(Number.parseInt(this.childNodeCountEditBox.string));
         this.scrollViewCtrl.reset();
         this.loadingDialog.hide();
+    }
+
+    onScheduleLoadBtnClick() {
+        this.loadingDialog.show();
+        this.scrollViewCtrl.reset();
+        //await this.scrollViewCtrl.sequenceLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        this.scrollViewCtrl.scheduleLoad(Number.parseInt(this.childNodeCountEditBox.string));
+        // this.scrollViewCtrl.reset();
+        // this.loadingDialog.hide();
     }
 
 }

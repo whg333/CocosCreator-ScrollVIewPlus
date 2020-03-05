@@ -1,4 +1,5 @@
 import ItemPrefabCtrl from "./ItemPrefabCtrl";
+import LoadingDialog from "../../prefabs/LoadingDialog";
 
 const { ccclass, property } = cc._decorator;
 
@@ -19,6 +20,8 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
 
 	@property(cc.Prefab)
 	itemPrefab: cc.Prefab = null;
+
+    loadingDialog: LoadingDialog = null;
 
 	count: number = 0; //每帧创建的数目
 	frame: number = 0; //类似于帧数
@@ -110,6 +113,9 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         })
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // 示例三：递归创建指定数量的子节点
+
     async recursionLoad(length: number){
         this.scrollView.content.removeAllChildren();
         console.time("recursion");
@@ -125,12 +131,15 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // 示例四：顺序创建指定数量的子节点
+
     async sequenceLoad(length: number) {
         this.scrollView.content.removeAllChildren();
         console.time("sequence");
         for(let i=0;i<length;i++){
             this._initItem(i);
-            if(/*i != length-1*/i%10 == 0){ //相当于每次（帧）创建10个
+            if(/*i != length-1*/i%20 == 0){ //相当于每次（帧）创建10个
                 await this.sleep(0);
             }
         }
@@ -181,6 +190,34 @@ export default class DirectLoadScrollViewCtrl extends cc.Component {
         }while(!stop);
         await this.sleep(0);
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // 示例五：定时器下一帧创建指定数量的子节点
+
+    scheduleLoad(length: number){
+        this.initItemCount = length;
+        console.time("schedule");
+        this.schedule(this.doInitItem, 0);
+    }
+
+    private initItemCount: number = 0;
+
+    private doInitItem = () => {
+        if(this.initItemCount > 0){
+            while(this.initItemCount > 0){
+                this._initItem(this.initItemCount--);
+                if(/*i != length-1*/this.initItemCount%20 == 0){ //相当于每次（帧）创建10个
+                    break;
+                }
+            }
+        }else{
+            this.unschedule(this.doInitItem);
+            console.timeEnd("schedule");
+
+            this.reset();
+            this.loadingDialog.hide();
+        }
+    };
 
     private _initItem(itemIndex: number) {
 	    // console.time("_initItem");
